@@ -10,21 +10,16 @@ import 'package:http/http.dart' as https;
 
 class PersonalRelyingPartyServer
     extends RelyingPartyServer<RpRequest, RpResponse> {
+  String? username;
   final client = https.Client();
   String? cookie;
   void init() {}
 
   @override
-  Future<RpResponse> completeAuthenticate(
-      AuthenticationCompleteRequest request) async {
-    return RpResponse(success: true);
-  }
-
-  @override
   Future<AuthenticationInitResponse> initAuthenticate(RpRequest request) async {
     Map<String, dynamic> body = {"username": request.email};
     final resposne = await client.post(
-        Uri.parse("https://e063-115-246-26-148.ngrok-free.app/login"),
+        Uri.parse("https://79ec-115-246-26-148.ngrok-free.app/login"),
         body: body);
     Map<String, dynamic> credentials = {};
     if (resposne.statusCode == 200) {
@@ -33,26 +28,40 @@ class PersonalRelyingPartyServer
     } else {
       print("FAILLLLLLLLLLLLLL");
     }
+    final allowcredentials = credentials['publicKey']['allowCredentials'];
     return AuthenticationInitResponse(
         rpId: credentials['publicKey']['rpId'],
-        challenge: credentials['publicKey']['challenge']);
+        challenge: credentials['publicKey']['challenge'],
+        allowCredentials: [
+          AllowCredential(
+              type: allowcredentials[0]['type'],
+              id: allowcredentials[0]['id'],
+              transports: ['platform', 'cross-platform'])
+        ]);
+  }
+
+  @override
+  Future<RpResponse> completeAuthenticate(
+      AuthenticationCompleteRequest request) async {
+    return RpResponse(success: true);
   }
 
   @override
   Future<RegistrationInitResponse> initRegister(RpRequest request) async {
+    username = request.email;
     Map<String, String> body = {
       "username": request.email,
       "display": request.email
     };
     final response = await client.post(
-        Uri.parse("https://e063-115-246-26-148.ngrok-free.app/register"),
+        Uri.parse("https://79ec-115-246-26-148.ngrok-free.app/register"),
         body: body);
     cookie = response.headers['set-cookie'];
     Map<String, dynamic> credentialCreationRequestoptions = {};
     if (response.statusCode == 200) {
       credentialCreationRequestoptions = json.decode(response.body);
       credentialCreationRequestoptions['publicKey']['origin'] =
-          "https://e063-115-246-26-148.ngrok-free.app";
+          "https://79ec-115-246-26-148.ngrok-free.app";
       print(credentialCreationRequestoptions);
     } else {
       print("FAILLLLLLLLLLLLLL");
@@ -81,7 +90,7 @@ class PersonalRelyingPartyServer
       RegistrationCompleteRequest request) async {
     // print(request.id + "\n" + request.clientDataJSON + "\n" + request.rawId);
     Map<String, dynamic> body = {
-      "username": "shrey12",
+      "username": username,
       "credential": jsonEncode({
         "id": request.id,
         "response": {
@@ -93,10 +102,10 @@ class PersonalRelyingPartyServer
           "credProps": {"rk": true}
         }
       }),
-      "credname": "shrey12"
+      "credname": username
     };
     final resposne = await client.post(
-        Uri.parse("https://e063-115-246-26-148.ngrok-free.app/finishauth"),
+        Uri.parse("https://79ec-115-246-26-148.ngrok-free.app/finishauth"),
         body: body,
         headers: {'Cookie': cookie!});
     print(resposne.body);

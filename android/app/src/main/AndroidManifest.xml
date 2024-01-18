@@ -29,7 +29,7 @@
                 <action android:name="android.intent.action.VIEW"/>
                 <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.BROWSABLE"/>
-                <data android:scheme="https" android:host="e063-115-246-26-148.ngrok-free.app" android:pathPattern="/.."/>
+                <data android:scheme="https" android:host="79ec-115-246-26-148.ngrok-free.app" android:pathPattern="/.."/>
             </intent-filter>
         </activity>
         <!-- Don't delete the meta-data below.
