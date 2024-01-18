@@ -30,14 +30,9 @@ class PersonalRelyingPartyServer
     }
     final allowcredentials = credentials['publicKey']['allowCredentials'];
     return AuthenticationInitResponse(
-        rpId: credentials['publicKey']['rpId'],
-        challenge: credentials['publicKey']['challenge'],
-        allowCredentials: [
-          AllowCredential(
-              type: allowcredentials[0]['type'],
-              id: allowcredentials[0]['id'],
-              transports: ['platform', 'cross-platform'])
-        ]);
+      rpId: credentials['publicKey']['rpId'],
+      challenge: credentials['publicKey']['challenge'],
+    );
   }
 
   @override
